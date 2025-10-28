@@ -23,9 +23,23 @@ export default function App() {
   return (
     <>
       {/* Top navigation bar */}
-      <AppBar position="sticky">
+      <AppBar
+        position="sticky"
+        sx={{
+          backgroundColor: "#0e0e0e",
+          boxShadow: "0 1px 8px rgba(0, 230, 118, 0.25)",
+        }}
+      >
         <Toolbar>
-          <Typography variant="h6" sx={{ flexGrow: 1 }}>
+          <Typography
+            variant="h6"
+            sx={{
+              flexGrow: 1,
+              fontWeight: 700,
+              letterSpacing: 1,
+              color: "#00e676",
+            }}
+          >
             Personal Trainer
           </Typography>
 
@@ -34,11 +48,15 @@ export default function App() {
             value={tabValue}
             textColor="inherit"
             sx={{
-              "& .MuiTabs-indicator": { backgroundColor: "white" },
-              "& .MuiTab-root": { color: "white" },
-              "& .MuiTab-root.Mui-selected": {
+              "& .MuiTabs-indicator": { backgroundColor: "#00e676" },
+              "& .MuiTab-root": {
                 color: "white",
-                fontWeight: "bold",
+                fontWeight: "600",
+                textTransform: "uppercase",
+              },
+              "& .MuiTab-root.Mui-selected": {
+                color: "#00e676",
+                fontWeight: 700,
               },
             }}
           >
