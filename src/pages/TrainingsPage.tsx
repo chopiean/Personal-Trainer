@@ -17,7 +17,6 @@ import {
   TextField,
   Stack,
   Typography,
-  Box,
   CircularProgress,
 } from "@mui/material";
 import dayjs from "dayjs";
@@ -87,16 +86,6 @@ export default function TrainingsPage() {
     <Stack gap={2}>
       {/* Page title and underline divider */}
       <Typography variant="h5">Trainings</Typography>
-      <Box
-        sx={{
-          height: "3px",
-          backgroundColor: "white",
-          borderRadius: 1,
-          alignSelf: "flex-start",
-          width: "fit-content",
-          minWidth: "15%",
-        }}
-      />
 
       {/* Search field */}
       <TextField

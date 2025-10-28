@@ -17,7 +17,6 @@ import {
   TextField,
   Stack,
   Typography,
-  Box,
   CircularProgress,
 } from "@mui/material";
 
@@ -91,16 +90,6 @@ export default function CustomersPage() {
     <Stack gap={2}>
       {/* Page title and white underline divider */}
       <Typography variant="h5">Customers</Typography>
-      <Box
-        sx={{
-          height: "3px",
-          backgroundColor: "white",
-          borderRadius: 1,
-          alignSelf: "flex-start",
-          width: "fit-content",
-          minWidth: "18%",
-        }}
-      />
 
       {/* Search bar for filtering customers */}
       <TextField
