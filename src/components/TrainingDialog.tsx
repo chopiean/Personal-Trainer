@@ -1,3 +1,8 @@
+/**
+ * TrainingDialog.tsx
+ * Handles adding or editing training sessions with neon-green dark theme.
+ * Integrates DateTimePicker, form validation, and dynamic customer selection.
+ */
 import {
   Dialog,
   DialogTitle,
@@ -19,11 +24,18 @@ import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 
+// === Type definitions ===
+type TrainingCustomer = {
+  firstname: string;
+  lastname: string;
+  _links?: { self?: { href?: string } };
+};
+
 type Training = {
   date: string;
   activity: string;
   duration: number;
-  customer: string | { firstname: string; lastname: string } | null;
+  customer: string | TrainingCustomer | null;
   customerHref?: string;
 };
 
@@ -46,6 +58,7 @@ export default function TrainingDialog({
   onSave,
   training,
 }: Props) {
+  // === State ===
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [customerName, setCustomerName] = useState("");
   const [trainingData, setTrainingData] = useState<Training>({
@@ -55,6 +68,7 @@ export default function TrainingDialog({
     customer: "",
   });
 
+  // === Fetch customers ===
   useEffect(() => {
     fetch(
       "https://customer-rest-service-frontend-personaltrainer.2.rahtiapp.fi/api/customers"
@@ -64,6 +78,7 @@ export default function TrainingDialog({
       .catch((err) => console.error("Customer fetch error:", err));
   }, []);
 
+  // === Initialize Dialog Data ===
   useEffect(() => {
     if (!training) {
       setTrainingData({
@@ -94,7 +109,7 @@ export default function TrainingDialog({
       const first = customerObj.firstname || "";
       const last = customerObj.lastname || "";
       const fullName = `${first} ${last}`.trim();
-      console.log("✅ Setting customer name in dialog:", fullName);
+      console.log("Setting customer name in dialog:", fullName);
       setCustomerName(fullName);
     } else {
       console.warn("⚠️ No customer object found in training:", training);
@@ -102,6 +117,7 @@ export default function TrainingDialog({
     }
   }, [training]);
 
+  // === Save Handler ===
   const handleSave = () => {
     if (!trainingData.activity.trim()) {
       alert("Please enter activity.");
@@ -114,6 +130,34 @@ export default function TrainingDialog({
     onSave(trainingData);
   };
 
+  // === Custom Theme ===
+  const neonTheme = createTheme({
+    palette: {
+      mode: "dark",
+      primary: { main: "#00e676" },
+    },
+    components: {
+      MuiSvgIcon: { styleOverrides: { root: { color: "#00e676" } } },
+      MuiOutlinedInput: {
+        styleOverrides: {
+          root: {
+            "& .MuiOutlinedInput-notchedOutline": { borderColor: "#2a2a2a" },
+            "&:hover .MuiOutlinedInput-notchedOutline": {
+              borderColor: "#00e676",
+            },
+            "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+              borderColor: "#00e676",
+              boxShadow: "0 0 6px rgba(0, 230, 118, 0.4)",
+            },
+            "& input": { color: "white" },
+            "& .MuiSvgIcon-root": { color: "#00e676" },
+          },
+        },
+      },
+    },
+  });
+
+  // === Render UI ===
   return (
     <Dialog
       open={open}
@@ -128,62 +172,26 @@ export default function TrainingDialog({
         },
       }}
     >
+      {/* === Dialog Title === */}
       <DialogTitle sx={{ fontWeight: 700, color: "#00e676" }}>
         {training ? "Edit Training" : "Add Training"}
       </DialogTitle>
 
+      {/* === Dialog Content === */}
       <DialogContent sx={{ backgroundColor: "#121212" }}>
         <Stack spacing={2} mt={1}>
           <LocalizationProvider dateAdapter={AdapterDayjs}>
-            <ThemeProvider
-              theme={createTheme({
-                palette: {
-                  mode: "dark",
-                  primary: { main: "#00e676" },
-                },
-                components: {
-                  MuiSvgIcon: {
-                    styleOverrides: {
-                      root: { color: "#00e676" },
-                    },
-                  },
-                  MuiOutlinedInput: {
-                    styleOverrides: {
-                      root: {
-                        "& .MuiOutlinedInput-notchedOutline": {
-                          borderColor: "#2a2a2a",
-                        },
-                        "&:hover .MuiOutlinedInput-notchedOutline": {
-                          borderColor: "#00e676",
-                        },
-                        "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                          borderColor: "#00e676",
-                          boxShadow: "0 0 6px rgba(0, 230, 118, 0.4)",
-                        },
-                        "& input": { color: "white" },
-                        "& .MuiSvgIcon-root": { color: "#00e676" },
-                      },
-                    },
-                  },
-                  ...{
-                    MuiPickersDay: {
-                      styleOverrides: {
-                        root: {
-                          "&.Mui-selected": {
-                            backgroundColor: "#00e676",
-                            color: "#000",
-                          },
-                          "&:hover": {
-                            backgroundColor: "rgba(0,230,118,0.3)",
-                          },
-                        },
-                      },
-                    },
-                  },
-                },
-              })}
-            >
+            <ThemeProvider theme={neonTheme}>
               <DateTimePicker
+                sx={{
+                  "& .MuiPickersDay-root.Mui-selected": {
+                    backgroundColor: "#00e676",
+                    color: "#000",
+                  },
+                  "& .MuiPickersDay-root:hover": {
+                    backgroundColor: "rgba(0,230,118,0.3)",
+                  },
+                }}
                 label="Date & Time"
                 value={dayjs(trainingData.date)}
                 onChange={(newVal) =>
@@ -197,10 +205,7 @@ export default function TrainingDialog({
                 enableAccessibleFieldDOMStructure={false}
                 slots={{ textField: TextField }}
                 slotProps={{
-                  textField: {
-                    fullWidth: true,
-                    variant: "outlined",
-                  },
+                  textField: { fullWidth: true, variant: "outlined" },
                 }}
               />
             </ThemeProvider>
@@ -242,7 +247,7 @@ export default function TrainingDialog({
             )}
 
             {training ? (
-              //Edit mode
+              // === Edit mode ===
               <TextField
                 key={customerName}
                 value={customerName || ""}
@@ -265,7 +270,7 @@ export default function TrainingDialog({
                 }}
               />
             ) : (
-              //Add mode
+              // === Add mode ===
               <Select
                 labelId="customer-label"
                 label="Customer"
@@ -303,6 +308,7 @@ export default function TrainingDialog({
         </Stack>
       </DialogContent>
 
+      {/* === Dialog Actions === */}
       <DialogActions
         sx={{
           backgroundColor: "#121212",

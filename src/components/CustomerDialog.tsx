@@ -1,3 +1,9 @@
+/**
+ * CustomerDialog.tsx
+ * Handles adding or editing customer details in a neon-green dark-themed dialog.
+ * Reusable across customer management pages.
+ */
+
 import {
   Dialog,
   Button,
@@ -10,6 +16,7 @@ import {
 import { useState, useEffect } from "react";
 import type { Customer } from "../pages/CustomersPage";
 
+// === Props ===
 type Props = {
   open: boolean;
   onClose: () => void;
@@ -22,6 +29,7 @@ export default function CustomerDialog({
   onSave,
   customer,
 }: Props) {
+  // === State ===
   const [cust, setCust] = useState<Customer>(
     customer ?? { firstname: "", lastname: "", email: "", phone: "", city: "" }
   );
@@ -30,13 +38,16 @@ export default function CustomerDialog({
     if (customer) setCust(customer);
   }, [customer]);
 
+  // === Handlers ===
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) =>
     setCust({ ...cust, [e.target.name]: e.target.value });
 
+  // === Render UI ===
   return (
     <Dialog
       open={open}
       onClose={onClose}
+      TransitionProps={{ timeout: 300 }}
       PaperProps={{
         sx: {
           borderRadius: 3,
@@ -47,7 +58,7 @@ export default function CustomerDialog({
         },
       }}
     >
-      {/* Dialog title */}
+      {/* === Dialog title === */}
       <DialogTitle
         sx={{
           fontWeight: 700,
@@ -61,7 +72,7 @@ export default function CustomerDialog({
         {customer ? "Edit Customer" : "Add Customer"}
       </DialogTitle>
 
-      {/* Dialog content */}
+      {/* === Dialog content === */}
       <DialogContent
         sx={{
           backgroundColor: "#121212",
@@ -142,7 +153,7 @@ export default function CustomerDialog({
         </Stack>
       </DialogContent>
 
-      {/* Dialog actions */}
+      {/* === Dialog actions === */}
       <DialogActions
         sx={{
           backgroundColor: "#121212",

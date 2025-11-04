@@ -1,3 +1,8 @@
+/**
+ * TrainingsPage.tsx
+ * Displays, filters, and managed training sessions.
+ * Supports CRUD operations with neon-green dark theme.
+ */
 import { useEffect, useState, useMemo } from "react";
 import {
   Paper,
@@ -15,6 +20,8 @@ import {
   IconButton,
   Tooltip,
   Button,
+  Snackbar,
+  Alert,
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
@@ -22,20 +29,25 @@ import EditIcon from "@mui/icons-material/Edit";
 import dayjs from "dayjs";
 import ConfirmDialog from "../components/ConfirmDialog";
 import TrainingDialog from "../components/TrainingDialog";
+import type { Customer } from "./CustomersPage";
 
 const API_BASE =
   "https://customer-rest-service-frontend-personaltrainer.2.rahtiapp.fi/api";
+
+// === Type definitions ===
+type TrainingCustomer = Pick<Customer, "firstname" | "lastname">;
 
 type Training = {
   id?: number;
   date: string;
   activity: string;
   duration: number;
-  customer: string | { firstname: string; lastname: string } | null;
+  customer: string | TrainingCustomer | null;
   customerHref?: string;
 };
 
 export default function TrainingsPage() {
+  // === State ===
   const [trainings, setTrainings] = useState<Training[]>([]);
   const [search, setSearch] = useState("");
   const [orderBy, setOrderBy] = useState<keyof Training | undefined>();
@@ -46,7 +58,9 @@ export default function TrainingsPage() {
   const [selectedTraining, setSelectedTraining] = useState<
     Training | undefined
   >();
+  const [snackbar, setSnackbar] = useState({ open: false, message: "" });
 
+  // === Fetch all trainings ===
   const fetchTrainings = async () => {
     setLoading(true);
     try {
@@ -64,6 +78,16 @@ export default function TrainingsPage() {
     fetchTrainings();
   }, []);
 
+  // === Format customer name ===
+  const formatCustomerName = (
+    customer: string | TrainingCustomer | Customer | null
+  ) => {
+    if (typeof customer === "object" && customer)
+      return `${customer.firstname} ${customer.lastname}`;
+    return "-";
+  };
+
+  // === Filtering & Sorting ===
   const filtered = useMemo(() => {
     const term = search.toLowerCase();
     return [...trainings]
@@ -88,6 +112,7 @@ export default function TrainingsPage() {
       });
   }, [trainings, search, orderBy, order]);
 
+  // === Sorting Handler ===
   const handleSort = (col: keyof Training) => {
     if (orderBy === col) setOrder(order === "asc" ? "desc" : "asc");
     else {
@@ -96,6 +121,7 @@ export default function TrainingsPage() {
     }
   };
 
+  // === Save or Update Training ===
   const saveTraining = async (t: Training) => {
     const editing = Boolean(selectedTraining?.id);
     const method = editing ? "PUT" : "POST";
@@ -116,27 +142,70 @@ export default function TrainingsPage() {
     };
 
     try {
-      await fetch(url, {
+      const res = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
+
+      if (!res.ok) throw new Error("Save or update failed.");
+
       setOpenDialog(false);
       setSelectedTraining(undefined);
       fetchTrainings();
+      setSnackbar({
+        open: true,
+        message: editing
+          ? "Training updated successfully!"
+          : "Training added successfully!",
+      });
     } catch (err) {
       console.error("Save/update error:", err);
+      setSnackbar({ open: true, message: "Error saving training." });
     }
   };
 
-  const deleteTraining = async (id: number) => {
-    await fetch(`${API_BASE}/trainings/${id}`, { method: "DELETE" });
-    fetchTrainings();
-    setConfirm({ open: false, id: 0 });
+  // === Delete Training ===
+  const handleDeleteTraining = async (id: number) => {
+    try {
+      await fetch(`${API_BASE}/trainings/${id}`, { method: "DELETE" });
+      fetchTrainings();
+      setSnackbar({ open: true, message: "Training deleted." });
+    } catch (error) {
+      console.error("Delete error:", error);
+      setSnackbar({ open: true, message: "Error deleting training." });
+    } finally {
+      setConfirm({ open: false, id: 0 });
+    }
   };
 
+  // === Edit Button Handler ===
+  const handleEditTraining = (t: Training) => {
+    console.log("Editing training object:", t);
+
+    const customerObj =
+      t.customer && typeof t.customer === "object"
+        ? (t.customer as Customer)
+        : null;
+
+    const trainingToEdit: Training = {
+      ...t,
+      date: dayjs(t.date).toISOString(),
+      customerHref:
+        customerObj?._links?.self?.href ||
+        (typeof t.customer === "string" ? t.customer : ""),
+      customer: customerObj
+        ? { firstname: customerObj.firstname, lastname: customerObj.lastname }
+        : null,
+    };
+    setSelectedTraining(trainingToEdit);
+    setOpenDialog(true);
+  };
+
+  // === Render UI ===
   return (
     <Stack gap={2}>
+      {/*/ === Title === */}
       <Typography
         variant="h5"
         sx={{ fontWeight: 700, color: "#00e676", textAlign: "left" }}
@@ -144,6 +213,7 @@ export default function TrainingsPage() {
         Trainings
       </Typography>
 
+      {/*/ === Add Button === */}
       <Button
         variant="contained"
         startIcon={<AddIcon />}
@@ -162,6 +232,7 @@ export default function TrainingsPage() {
         Add Training
       </Button>
 
+      {/*/ === Search === */}
       <TextField
         label="Search trainings"
         value={search}
@@ -179,6 +250,7 @@ export default function TrainingsPage() {
         }}
       />
 
+      {/*/ === Table === */}
       {loading ? (
         <Stack alignItems="center" mt={3}>
           <CircularProgress sx={{ color: "#00e676" }} />
@@ -211,51 +283,11 @@ export default function TrainingsPage() {
                   </TableCell>
                   <TableCell>{t.activity}</TableCell>
                   <TableCell>{t.duration}</TableCell>
-                  <TableCell>
-                    {typeof t.customer === "object" && t.customer
-                      ? `${t.customer.firstname} ${t.customer.lastname}`
-                      : "-"}
-                  </TableCell>
+                  <TableCell>{formatCustomerName(t.customer)}</TableCell>
                   <TableCell>
                     <Tooltip title="Edit Training">
-                      <IconButton
-                        onClick={() => {
-                          console.log("Editing training object:", t);
-
-                          // Ensure customer is not null or undefined
-                          type CustomerObj = {
-                            firstname: string;
-                            lastname: string;
-                            _links?: { self?: { href?: string } };
-                          };
-
-                          const customerObj: CustomerObj | null =
-                            t.customer && typeof t.customer === "object"
-                              ? (t.customer as CustomerObj)
-                              : null;
-
-                          const trainingToEdit = {
-                            ...t,
-                            date: dayjs(t.date).toISOString(),
-                            customerHref:
-                              customerObj?._links?.self?.href ||
-                              (typeof t.customer === "string"
-                                ? t.customer
-                                : ""),
-                          };
-
-                          if (customerObj) {
-                            trainingToEdit.customer = {
-                              firstname: customerObj.firstname,
-                              lastname: customerObj.lastname,
-                            };
-                          }
-
-                          setSelectedTraining(trainingToEdit);
-                          setOpenDialog(true);
-                        }}
-                      >
-                        <EditIcon sx={{ color: "#00e676" }} />
+                      <IconButton onClick={() => handleEditTraining(t)}>
+                        <EditIcon sx={{ color: "#00e676" }}></EditIcon>
                       </IconButton>
                     </Tooltip>
 
@@ -275,14 +307,17 @@ export default function TrainingsPage() {
           </Table>
         </TableContainer>
       )}
+
+      {/*/ === Confirm Delete Dialog === */}
       <ConfirmDialog
         open={confirm.open}
         title="Delete Training"
         message="Are you sure you want to delete this training?"
-        onConfirm={() => deleteTraining(confirm.id)}
+        onConfirm={() => handleDeleteTraining(confirm.id)}
         onCancel={() => setConfirm({ open: false, id: 0 })}
       />
 
+      {/*/ === Add/Edit Training Dialog === */}
       <TrainingDialog
         open={openDialog}
         onClose={() => {
@@ -292,6 +327,20 @@ export default function TrainingsPage() {
         onSave={saveTraining}
         training={selectedTraining}
       />
+
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={4000}
+        onClose={() => setSnackbar({ open: false, message: "" })}
+        message={snackbar.message}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      >
+        <Alert
+          severity={snackbar.message.includes("Error") ? "error" : "success"}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </Stack>
   );
 }
