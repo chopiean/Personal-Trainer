@@ -1,8 +1,9 @@
 /**
  * App.tsx
  * Main application layout.
- * Contains a top AppBar navigation between Customers and Trainings pages.
+ * Contains top AppBar navigation between Customers, Trainings, and Calendar pages.
  */
+
 import {
   AppBar,
   Toolbar,
@@ -11,18 +12,31 @@ import {
   Tab,
   Container,
 } from "@mui/material";
-import { Link, Routes, Route, useLocation, Navigate } from "react-router-dom";
+import {
+  BrowserRouter,
+  Link,
+  Routes,
+  Route,
+  useLocation,
+  Navigate,
+} from "react-router-dom";
 import CustomersPage from "./pages/CustomersPage";
 import TrainingsPage from "./pages/TrainingsPage";
+import TrainingsCalendar from "./pages/TrainingsCalendar";
 
-export default function App() {
-  //Detect current URL to highlight correct navigation tab
+function AppContent() {
   const { pathname } = useLocation();
-  const tabValue = pathname.startsWith("/trainings") ? 1 : 0;
+
+  // Highlight current tab
+  const tabValue = pathname.startsWith("/trainings")
+    ? 1
+    : pathname.startsWith("/calendar")
+    ? 2
+    : 0;
 
   return (
     <>
-      {/* Top navigation bar */}
+      {/* Top navigation */}
       <AppBar
         position="sticky"
         sx={{
@@ -43,7 +57,6 @@ export default function App() {
             Personal Trainer
           </Typography>
 
-          {/* Tabs for navigation between paged */}
           <Tabs
             value={tabValue}
             textColor="inherit"
@@ -60,25 +73,30 @@ export default function App() {
               },
             }}
           >
-            <Tab label="Customers" component={Link} to="/customers"></Tab>
-            <Tab label="Trainings" component={Link} to="/trainings"></Tab>
+            <Tab label="Customers" component={Link} to="/customers" />
+            <Tab label="Trainings" component={Link} to="/trainings" />
+            <Tab label="Calendar" component={Link} to="/calendar" />
           </Tabs>
         </Toolbar>
       </AppBar>
 
-      {/* Page content area */}
-      <Container className="page-container">
+      {/* Page content */}
+      <Container sx={{ py: 3 }}>
         <Routes>
-          <Route
-            path="/"
-            element={<Navigate to="/customers" replace />}
-          ></Route>
-
-          {/* Define available routes */}
-          <Route path="/customers" element={<CustomersPage />}></Route>
-          <Route path="/trainings" element={<TrainingsPage />}></Route>
+          <Route path="/" element={<Navigate to="/customers" replace />} />
+          <Route path="/customers" element={<CustomersPage />} />
+          <Route path="/trainings" element={<TrainingsPage />} />
+          <Route path="/calendar" element={<TrainingsCalendar />} />
         </Routes>
       </Container>
     </>
+  );
+}
+
+export default function App() {
+  return (
+    <BrowserRouter>
+      <AppContent />
+    </BrowserRouter>
   );
 }

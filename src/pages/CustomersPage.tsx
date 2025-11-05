@@ -42,6 +42,8 @@ export type Customer = {
   email: string;
   phone: string;
   city: string;
+  streetaddress: string;
+  postcode: string;
   _links?: { self: { href: string } };
 };
 
@@ -146,6 +148,39 @@ export default function CustomersPage() {
         alert("Training added successfully!");
       })
       .catch((err) => console.error("Add training error:", err));
+  };
+
+  const handleExportCSV = () => {
+    if (!customers || customers.length === 0) {
+      alert("No customers to export!");
+      return;
+    }
+
+    const filteredData = customers.map((c: Customer) => ({
+      firstname: c.firstname,
+      lastname: c.lastname,
+      email: c.email,
+      phone: c.phone,
+      streetaddress: c.streetaddress,
+      postcode: c.postcode,
+      city: c.city,
+    }));
+
+    const header = Object.keys(filteredData[0]).join(";");
+    const rows = filteredData
+      .map((obj: Customer) =>
+        Object.values(obj)
+          .map((v) => `"${v}"`)
+          .join(";")
+      )
+      .join("\n");
+
+    const csvContent = `${header}\n${rows}`;
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = "customers.csv";
+    link.click();
   };
 
   // ===== UI =====
@@ -272,6 +307,9 @@ export default function CustomersPage() {
           </Table>
         </TableContainer>
       )}
+      <Button variant="outlined" onClick={handleExportCSV}>
+        Export Customers (CSV)
+      </Button>
 
       {/* ===== DIALOGS ===== */}
 

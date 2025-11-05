@@ -31,7 +31,15 @@ export default function CustomerDialog({
 }: Props) {
   // === State ===
   const [cust, setCust] = useState<Customer>(
-    customer ?? { firstname: "", lastname: "", email: "", phone: "", city: "" }
+    customer ?? {
+      firstname: "",
+      lastname: "",
+      email: "",
+      phone: "",
+      streetaddress: "",
+      postcode: "",
+      city: "",
+    }
   );
 
   useEffect(() => {
