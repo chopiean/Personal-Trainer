@@ -1,3 +1,9 @@
+/**
+ * StatisticsPage.tsx
+ * Displays a bar chart of total training durations grouped by activity.
+ * Fetches data from Personal Trainer REST API and visualizes it using Recharts,
+ * with a neon-green dark theme and Framer Motion page transitions.
+ */
 import { useState, useEffect } from "react";
 import {
   BarChart,
@@ -12,6 +18,7 @@ import _ from "lodash";
 import { Stack, Typography, CircularProgress } from "@mui/material";
 import { motion, easeInOut } from "framer-motion";
 
+// === Type definition ===
 type Training = {
   id?: number;
   date: string;
@@ -21,9 +28,11 @@ type Training = {
 };
 
 export default function StatisticsPage() {
+  // === State ===
   const [trainings, setTrainings] = useState<Training[]>([]);
   const [loading, setLoading] = useState(true);
 
+  // === Fetch data ===
   useEffect(() => {
     fetch(
       "https://customer-rest-service-frontend-personaltrainer.2.rahtiapp.fi/api/trainings"
@@ -34,35 +43,26 @@ export default function StatisticsPage() {
         else setTrainings(data);
       })
       .catch((err) => console.error("Error fetching trainings: ", err))
-      .finally(() => setLoading(false));
-  });
+      .finally(() => setTimeout(() => setLoading(false), 400));
+  }, []);
 
+  // === Process data for chart ===
   const data = _(trainings)
-    .groupBy("activity")
+    .groupBy((t) => t.activity || "Unknown")
     .map((objs, key) => ({
       name: key,
       duration: _.sumBy(objs, "duration"),
     }))
     .value();
 
+  // === Page animation ===
   const pageMotion = {
-    initial: { opacity: 0, y: 30, scale: 0.98 },
+    initial: { opacity: 0, y: 20, scale: 0.98 },
     animate: { opacity: 1, y: 0, scale: 1 },
-    exit: { opacity: 0, y: -20, scale: 0.98 },
-    transition: {
-      duration: 0.9,
-      ease: easeInOut,
-    },
+    transition: { duration: 0.6, ease: easeInOut },
   };
 
-  const barVariants = {
-    initial: { scaleY: 0 },
-    animate: { scaleY: 1 },
-    transition: {
-      duration: 0.8,
-      ease: easeInOut,
-    },
-  };
+  // === Render UI ===
   return (
     <motion.div
       {...pageMotion}
@@ -78,6 +78,7 @@ export default function StatisticsPage() {
           Training Statistics
         </Typography>
 
+        {/* === Conditional loading state === */}
         {loading ? (
           <CircularProgress sx={{ color: "#00e676" }} />
         ) : (
@@ -86,6 +87,7 @@ export default function StatisticsPage() {
               data={data}
               margin={{ top: 30, right: 30, left: 20, bottom: 20 }}
             >
+              {/* === Chart grid and axes === */}
               <CartesianGrid strokeDasharray="3 3" stroke="#444" />
               <XAxis
                 dataKey="name"
@@ -103,6 +105,7 @@ export default function StatisticsPage() {
                   fill: "#b0b0b0",
                 }}
               />
+              {/* === Tooltip styling === */}
               <Tooltip
                 contentStyle={{
                   backgroundColor: "#1e1e1e",
@@ -112,22 +115,15 @@ export default function StatisticsPage() {
                 itemStyle={{ color: "#fff" }}
               />
 
-              {data.map((_, i) => (
-                <motion.g
-                  key={i}
-                  initial="initial"
-                  animate="animate"
-                  variants={barVariants}
-                  transition={{
-                    ...barVariants.transition,
-                  }}
-                ></motion.g>
-              ))}
+              {/* === Bar chart styling === */}
               <Bar
                 dataKey="duration"
                 fill="#00e676"
-                opacity={0.8}
+                opacity={0.9}
                 barSize={60}
+                animationDuration={800}
+                animationBegin={200}
+                animationEasing="ease-out"
               />
             </BarChart>
           </ResponsiveContainer>
