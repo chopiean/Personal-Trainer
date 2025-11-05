@@ -92,7 +92,8 @@ export default function TrainingsCalendar() {
     <motion.div
       {...animation}
       style={{
-        padding: "1rem",
+        padding: "10px",
+        borderRadius: "10px",
         backgroundColor: "#0e0e0e",
         color: "#00e676",
         minHeight: "100vh",
@@ -130,15 +131,24 @@ export default function TrainingsCalendar() {
 
         /* Calendar grid background */
         .fc-scrollgrid {
-          background-color: #0e0e0e;
+          border: 0.5px solid white !important;
+          border-radius: 8px;
+          overflow: hiddenl
         }
 
         /* Grid lines */
         .fc-theme-standard td,
         .fc-theme-standard th {
-          border-color: #2a2a2a;
+          border-top: none !important;
+          border-left: none !important
         }
-
+        .fc-theme-standard tr:last-child td {
+          border-bottom: none !important;
+        }
+        .fc-theme-standard th:last-child,
+        .fc-theme-standard td:last-child {
+         border-right: none !important;
+        }
         /* Day and header text color */
         .fc-col-header-cell-cushion,
         .fc-daygrid-day-number {

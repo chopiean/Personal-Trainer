@@ -43,8 +43,20 @@ export default function CustomerDialog({
   );
 
   useEffect(() => {
-    if (customer) setCust(customer);
-  }, [customer]);
+    if (customer) {
+      setCust(customer);
+    } else {
+      setCust({
+        firstname: "",
+        lastname: "",
+        email: "",
+        phone: "",
+        streetaddress: "",
+        postcode: "",
+        city: "",
+      });
+    }
+  }, [customer, open]);
 
   // === Handlers ===
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) =>
