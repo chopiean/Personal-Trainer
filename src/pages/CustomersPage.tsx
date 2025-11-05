@@ -1,7 +1,10 @@
 /**
  * CustomersPage.tsx
  * Full CRUD interface for managing customers.
- * Includes: Add/Edit/Delete customer + Add training (with date picker).
+ * Features:
+ * - Add / Edit / Delete customers
+ * - Add training to a selected customers (with date picker)
+ * - Sort, search, and export to CSV
  */
 
 import { useState, useEffect, useMemo } from "react";
@@ -35,7 +38,7 @@ import ConfirmDialog from "../components/ConfirmDialog";
 const API_BASE =
   "https://customer-rest-service-frontend-personaltrainer.2.rahtiapp.fi/api";
 
-// --- Types ---
+// === Types ===
 export type Customer = {
   firstname: string;
   lastname: string;
@@ -62,7 +65,7 @@ export default function CustomersPage() {
   const [order, setOrder] = useState<"asc" | "desc">("asc");
   const [loading, setLoading] = useState(true);
 
-  // Dialogs
+  // === Dialogs ====
   const [openCustDialog, setOpenCustDialog] = useState(false);
   const [editCust, setEditCust] = useState<Customer | undefined>();
   const [confirm, setConfirm] = useState({ open: false, url: "" });
@@ -150,12 +153,15 @@ export default function CustomersPage() {
       .catch((err) => console.error("Add training error:", err));
   };
 
+  // === Export customers to CSV ===
+
   const handleExportCSV = () => {
     if (!customers || customers.length === 0) {
       alert("No customers to export!");
       return;
     }
 
+    // Filter only relevant fields
     const filteredData = customers.map((c: Customer) => ({
       firstname: c.firstname,
       lastname: c.lastname,
@@ -166,6 +172,7 @@ export default function CustomersPage() {
       city: c.city,
     }));
 
+    // Convert JSON -> CSV
     const header = Object.keys(filteredData[0]).join(";");
     const rows = filteredData
       .map((obj: Customer) =>
@@ -183,7 +190,7 @@ export default function CustomersPage() {
     link.click();
   };
 
-  // ===== UI =====
+  // ===== Render UI =====
   return (
     <Stack gap={2}>
       {/* Title */}

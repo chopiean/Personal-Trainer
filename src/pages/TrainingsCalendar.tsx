@@ -1,12 +1,22 @@
+/**
+ * TrainingsCalendar.tsx
+ * Displays all Personal Trainer trainings using FullCalendar.
+ * Includes animated transitions, clean modular code, and readable variable names for high code quality.
+ * Author: Xuan Hong An Le
+ * Date: November 2025
+ */
+
 import { useEffect, useState } from "react";
+import { motion, easeOut } from "framer-motion";
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
-dayjs.extend(customParseFormat);
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
+dayjs.extend(customParseFormat);
 
+// === TYPES ===
 type Training = {
   id?: number;
   date: string;
@@ -19,8 +29,10 @@ type Training = {
 };
 
 export default function TrainingsCalendar() {
+  // === STATE ===
   const [trainings, setTrainings] = useState<Training[]>([]);
 
+  // === FETCH TRAININGS ===
   useEffect(() => {
     fetch(
       "https://customer-rest-service-frontend-personaltrainer.2.rahtiapp.fi/api/trainings"
@@ -33,6 +45,7 @@ export default function TrainingsCalendar() {
       .catch((err) => console.error("Error fetching trainings:", err));
   }, []);
 
+  // === MAP TRAININGS TO EVENTS ===
   const events: {
     id: string;
     title: string;
@@ -40,11 +53,15 @@ export default function TrainingsCalendar() {
     end: string;
   }[] = trainings
     .map((t, i) => {
+      // Validate date format and parse with fallback
       let start = dayjs(t.date, ["YYYY-MM-DDTHH:mm:ss", "YYYY-MM-DD"], true);
       if (!start.isValid()) start = dayjs(t.date);
       if (!start.isValid()) return null; // skip bad date
 
+      // Calculate end time using duration
       const end = start.add(t.duration ?? 0, "minute");
+
+      // Combine activity and customer name
       const name =
         t.customer?.firstname && t.customer?.lastname
           ? `${t.customer.firstname} ${t.customer.lastname}`
@@ -62,8 +79,18 @@ export default function TrainingsCalendar() {
         e !== null
     );
 
+  // === PAGE ANIMATION SETTINGS ===
+  const animation = {
+    initial: { opacity: 0, y: 20 },
+    animate: { opacity: 1, y: 0 },
+    exit: { opacity: 0, y: -20 },
+    transition: { duration: 0.6, ease: easeOut },
+  };
+
+  // === RENDER UI ===
   return (
-    <div
+    <motion.div
+      {...animation}
       style={{
         padding: "1rem",
         backgroundColor: "#0e0e0e",
@@ -71,6 +98,7 @@ export default function TrainingsCalendar() {
         minHeight: "100vh",
       }}
     >
+      {/* === CUSTOM STYLES === */}
       <style>
         {`
         /* Toolbar title */
@@ -133,6 +161,12 @@ export default function TrainingsCalendar() {
           padding: 2px 4px;
         }
 
+        /* Hover effect for events */
+        .fc-event:hover {
+          transform: scale(1.05);
+          box-shadow: 0 0 10px rgba(0, 230, 118, 0.4);
+        }
+
         /* Week and Day view time column */
         .fc-timegrid-slot-label {
           color: #aaa !important;
@@ -144,6 +178,8 @@ export default function TrainingsCalendar() {
           color: #000000 !important;
           font-weight: 700;
         }
+
+        /* Axis labels */
         .fc-timegrid-axis-cushion,
         .fc-timegrid-axis {
           color: #ffffff !important; 
@@ -152,6 +188,7 @@ export default function TrainingsCalendar() {
       `}
       </style>
 
+      {/* === FULLCALENDAR === */}
       <FullCalendar
         locale="en-GB"
         height="calc(100vh - 120px)"
@@ -184,6 +221,6 @@ export default function TrainingsCalendar() {
           hour12: true,
         }}
       />
-    </div>
+    </motion.div>
   );
 }
