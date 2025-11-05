@@ -23,6 +23,7 @@ import {
 import CustomersPage from "./pages/CustomersPage";
 import TrainingsPage from "./pages/TrainingsPage";
 import TrainingsCalendar from "./pages/TrainingsCalendar";
+import StatisticsPage from "./pages/StatisticsPages";
 
 function AppContent() {
   const { pathname } = useLocation();
@@ -32,6 +33,8 @@ function AppContent() {
     ? 1
     : pathname.startsWith("/calendar")
     ? 2
+    : pathname.startsWith("/statistics")
+    ? 3
     : 0;
 
   return (
@@ -76,6 +79,7 @@ function AppContent() {
             <Tab label="Customers" component={Link} to="/customers" />
             <Tab label="Trainings" component={Link} to="/trainings" />
             <Tab label="Calendar" component={Link} to="/calendar" />
+            <Tab label="Statistics" component={Link} to="/statistics" />
           </Tabs>
         </Toolbar>
       </AppBar>
@@ -87,6 +91,7 @@ function AppContent() {
           <Route path="/customers" element={<CustomersPage />} />
           <Route path="/trainings" element={<TrainingsPage />} />
           <Route path="/calendar" element={<TrainingsCalendar />} />
+          <Route path="/statistics" element={<StatisticsPage />} />
         </Routes>
       </Container>
     </>
