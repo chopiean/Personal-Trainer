@@ -112,7 +112,7 @@ export default function StatisticsPage() {
                 itemStyle={{ color: "#fff" }}
               />
 
-              {data.map((d, i) => (
+              {data.map((_, i) => (
                 <motion.g
                   key={i}
                   initial="initial"
@@ -120,7 +120,6 @@ export default function StatisticsPage() {
                   variants={barVariants}
                   transition={{
                     ...barVariants.transition,
-                    delay: i * 0.0,
                   }}
                 ></motion.g>
               ))}
