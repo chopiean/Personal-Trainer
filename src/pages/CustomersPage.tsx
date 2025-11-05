@@ -342,6 +342,7 @@ export default function CustomersPage() {
         open={trainingDialog.open}
         onClose={() => setTrainingDialog({ open: false, href: "" })}
         onSave={(t) => saveTraining({ ...t, customer: trainingDialog.href })}
+        preselectedCustomerHref={trainingDialog.href}
       />
     </Stack>
   );

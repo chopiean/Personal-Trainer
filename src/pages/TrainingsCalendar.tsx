@@ -102,13 +102,16 @@ export default function TrainingsCalendar() {
       {/* === CUSTOM STYLES === */}
       <style>
         {`
+
         /* Toolbar title */
         .fc-toolbar-title {
           text-transform: uppercase;
+          text-align: centet !important;
           color: #00e676;
           font-weight: 700;
-          font-size: 1.6rem;
+          font-size: 1.6rem !important;
           letter-spacing: 2px;
+          margin-bottom: 0.3rem;
         }
 
         /* Navigation buttons */
@@ -118,8 +121,15 @@ export default function TrainingsCalendar() {
           color: #00e676;
           font-weight: 600;
           text-transform: uppercase;
-          padding: 6px 14px;
-          font-size: 0.9rem;
+          padding: 6px 14px !important;
+          font-size: 0.9rem !important;
+          min-width: 90px !important;
+        }
+        .fc .fc-toolbar-chunk{
+          display: flex;
+          flex-wrap: wrap;
+          justify-content: center;
+          gap: 0.4rem;
         }
 
         /* Larger prev/next arrows */
@@ -195,6 +205,55 @@ export default function TrainingsCalendar() {
           color: #ffffff !important; 
           font-weight: 600;
         }
+          /* Fix for smaller screens */
+          @media (max-width: 1024px) {
+            .fc-toolbar.fc-header-toolbar {
+              flex-wrap: wrap !important;
+              justify-content: center !important;
+              gap: 0.5rem;
+            }
+
+            .fc-toolbar-title {
+              text-align: center !important;
+              flex: 1 1 100%;
+              font-size: 1.3rem !important;
+            }
+
+            .fc .fc-button {
+              font-size: 0.8rem !important;
+              padding: 4px 10px !important;
+              min-width: 70px !important;
+            }
+              .fc .fc-toolbar-chunk {
+              display: flex;
+              justify-content: center;
+              flex-wrap: wrap;
+              gap: 0.3rem;
+            }
+          }
+          @media (max-width: 600px) {
+            .fc-toolbar.fc-header-toolbar {
+              flex-direction: column !important;
+              align-items: center !important;
+            }
+
+            .fc-toolbar-title {
+              font-size: 1.1rem !important;
+              margin: 0.4rem 0 !important;
+            }
+
+            .fc .fc-button {
+              font-size: 0.75rem !important;
+              padding: 3px 8px !important;
+              min-width: 60px !important;
+            }
+
+            .fc .fc-button-group {
+              display: flex;
+              justify-content: center;
+              flex-wrap: wrap;
+            }
+            
       `}
       </style>
 

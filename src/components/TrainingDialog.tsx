@@ -50,6 +50,7 @@ type Props = {
   onClose: () => void;
   onSave: (t: Training) => void;
   training?: Training;
+  preselectedCustomerHref?: string;
 };
 
 export default function TrainingDialog({
@@ -57,6 +58,7 @@ export default function TrainingDialog({
   onClose,
   onSave,
   training,
+  preselectedCustomerHref,
 }: Props) {
   // === State ===
   const [customers, setCustomers] = useState<Customer[]>([]);
@@ -68,6 +70,14 @@ export default function TrainingDialog({
     customer: "",
   });
 
+  useEffect(() => {
+    if (open && preselectedCustomerHref) {
+      setTrainingData((prev) => ({
+        ...prev,
+        customer: preselectedCustomerHref,
+      }));
+    }
+  }, [open, preselectedCustomerHref]);
   // === Fetch customers ===
   useEffect(() => {
     fetch(
