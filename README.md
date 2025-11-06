@@ -123,17 +123,21 @@ The **Statistics pages** provides visual insights into training activities.
 ## ⚙️ Installation & Setup
 
 1. **🧭 Clone the repository**
+   
    Open terminal and run:
    
    `git clone https://github.com/your-username/personal-trainer.git`
    
    `cd personal-trainer`
 
-3. **📦 Install dependencies**
+2. **📦 Install dependencies**
+   
    Install all required packages using npm
+   
    `npm install`
 
 4. **🧑‍💻 Start the development server**
+
    `npm run dev`
 
 ---
