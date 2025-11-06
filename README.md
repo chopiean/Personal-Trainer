@@ -184,10 +184,10 @@ The **Statistics pages** provides visual insights into training activities.
 
 ## 👨‍💻 Author
 
-An Le
-🎓 Haaga-Helia University of Applied Sciences
-📧 an.le@myy.haaga-helia.fi
-💻 Course: Frontend Development — Personal Trainer App Project
+- An Le
+- 🎓 Haaga-Helia University of Applied Sciences
+- 📧 an.le@myy.haaga-helia.fi
+- 💻 Course: Frontend Development — Personal Trainer App Project
 
 ---
 
