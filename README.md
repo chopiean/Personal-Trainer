@@ -31,6 +31,7 @@ The **Customers page** allows trainers to managae all customer data efficiently.
 - Export all customer data to **CSV**
 
 ### 📸 Screenshot
+<img width="1470" height="832" alt="image" src="https://github.com/user-attachments/assets/b5327533-6fe1-4669-a509-25e16f346c46" />
 
 **Key Components:**
 
@@ -56,6 +57,8 @@ The **Trainings module** manages all exercise sessions for customers.
 
 ### 📸 Screenshot
 
+<img width="1470" height="827" alt="image" src="https://github.com/user-attachments/assets/1c777b38-4b45-47c7-9f2e-a0d7bec42de9" />
+
 **Key Components:**
 
 - `TrainingDialog.tsx`
@@ -78,6 +81,7 @@ The **Calendar pages** visually displays all training sessions using **FullCalen
 - Automatically syncs with the REST API data
 
 ### 📸 Screenshot
+<img width="1467" height="827" alt="image" src="https://github.com/user-attachments/assets/d1fbd913-4902-42d5-af9a-9697ae7c323a" />
 
 **Key Components:**
 
@@ -105,6 +109,8 @@ The **Statistics pages** provides visual insights into training activities.
 
 ### 📸 Screenshot
 
+<img width="1470" height="825" alt="image" src="https://github.com/user-attachments/assets/621df06e-fe37-4464-a2aa-7dac6711bb8f" />
+
 **Key Components:**
 
 - `StatisticsPage.tsx`
@@ -119,13 +125,14 @@ The **Statistics pages** provides visual insights into training activities.
 1. **🧭 Clone the repository**
    Open terminal and run:
    `git clone https://github.com/your-username/personal-trainer.git`
+   
    `cd personal-trainer`
 
-2. **📦 Install dependencies**
+3. **📦 Install dependencies**
    Install all required packages using npm
    `npm install`
 
-3. **🧑‍💻 Start the development server**
+4. **🧑‍💻 Start the development server**
    `npm run dev`
 
 ---
