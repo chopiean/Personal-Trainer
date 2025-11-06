@@ -156,6 +156,7 @@ The **Statistics pages** provides visual insights into training activities.
 ## 🗂️ Folder Structure
 
 src/
+│
 ├── components/
 │   ├── CustomerDialog.tsx
 │   ├── TrainingDialog.tsx
@@ -169,9 +170,8 @@ src/
 ├── App.tsx
 ├── App.css
 └── index.tsx
-                 
 
-
+   
 ---
 
 ## 🚀 Deployment
