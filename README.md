@@ -10,9 +10,9 @@ The app connects to a public REST API and provides interactive modules for data 
 The application is divided into **four main parts**:
 
 1. **Customers** - Manage personal trainer customers
-1. **Trainings** - Record and manage training sessions.
-1. **Calendar** - Visualize training schedules
-1. **Statistics** - Analyze and visualize training data.
+2. **Trainings** - Record and manage training sessions.
+3. **Calendar** - Visualize training schedules
+4. **Statistics** - Analyze and visualize training data.
 
 Each section features a responsive design, modern UI, and real-time API integration.
 
@@ -124,6 +124,7 @@ The **Statistics pages** provides visual insights into training activities.
 
 1. **🧭 Clone the repository**
    Open terminal and run:
+   
    `git clone https://github.com/your-username/personal-trainer.git`
    
    `cd personal-trainer`
