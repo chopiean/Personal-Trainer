@@ -155,21 +155,18 @@ The **Statistics pages** provides visual insights into training activities.
 
 ## 🗂️ Folder Structure
 
-src/
-│
-├── components/
-│   ├── CustomerDialog.tsx
-│   ├── TrainingDialog.tsx
-│   └── ConfirmDialog.tsx
-│
-├── pages/
-│   ├── CustomersPage.tsx
-│   ├── TrainingsCalendar.tsx
-│   └── StatisticsPage.tsx
-│
-├── App.tsx
-├── App.css
-└── index.tsx
+- **src/**
+  - **components/**
+    - CustomerDialog.tsx  
+    - TrainingDialog.tsx  
+    - ConfirmDialog.tsx  
+  - **pages/**
+    - CustomersPage.tsx  
+    - TrainingsCalendar.tsx  
+    - StatisticsPage.tsx  
+  - App.tsx  
+  - App.css  
+  - index.tsx
 
    
 ---
