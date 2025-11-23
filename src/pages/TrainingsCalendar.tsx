@@ -1,9 +1,7 @@
 /**
  * TrainingsCalendar.tsx
  * Displays all Personal Trainer trainings using FullCalendar.
- * Includes animated transitions, clean modular code, and readable variable names for high code quality.
- * Author: Xuan Hong An Le
- * Date: November 2025
+ * Neon-dark theme + animations + scrollbar removed.
  */
 
 import { useEffect, useState } from "react";
@@ -14,6 +12,7 @@ import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
+
 dayjs.extend(customParseFormat);
 
 // === TYPES ===
@@ -29,7 +28,6 @@ type Training = {
 };
 
 export default function TrainingsCalendar() {
-  // === STATE ===
   const [trainings, setTrainings] = useState<Training[]>([]);
 
   // === FETCH TRAININGS ===
@@ -45,23 +43,15 @@ export default function TrainingsCalendar() {
       .catch((err) => console.error("Error fetching trainings:", err));
   }, []);
 
-  // === MAP TRAININGS TO EVENTS ===
-  const events: {
-    id: string;
-    title: string;
-    start: string;
-    end: string;
-  }[] = trainings
+  // === MAP TRAININGS TO FULLCALENDAR EVENTS ===
+  const events = trainings
     .map((t, i) => {
-      // Validate date format and parse with fallback
       let start = dayjs(t.date, ["YYYY-MM-DDTHH:mm:ss", "YYYY-MM-DD"], true);
       if (!start.isValid()) start = dayjs(t.date);
-      if (!start.isValid()) return null; // skip bad date
+      if (!start.isValid()) return null;
 
-      // Calculate end time using duration
       const end = start.add(t.duration ?? 0, "minute");
 
-      // Combine activity and customer name
       const name =
         t.customer?.firstname && t.customer?.lastname
           ? `${t.customer.firstname} ${t.customer.lastname}`
@@ -74,12 +64,14 @@ export default function TrainingsCalendar() {
         end: end.format(),
       };
     })
-    .filter(
-      (e): e is { id: string; title: string; start: string; end: string } =>
-        e !== null
-    );
+    .filter(Boolean) as {
+    id: string;
+    title: string;
+    start: string;
+    end: string;
+  }[];
 
-  // === PAGE ANIMATION SETTINGS ===
+  // === PAGE ANIMATION ===
   const animation = {
     initial: { opacity: 0, y: 20 },
     animate: { opacity: 1, y: 0 },
@@ -87,7 +79,6 @@ export default function TrainingsCalendar() {
     transition: { duration: 0.6, ease: easeOut },
   };
 
-  // === RENDER UI ===
   return (
     <motion.div
       {...animation}
@@ -99,165 +90,138 @@ export default function TrainingsCalendar() {
         minHeight: "100vh",
       }}
     >
-      {/* === CUSTOM STYLES === */}
+      {/* === GLOBAL & FULLCALENDAR STYLES === */}
       <style>
         {`
+        /* ========= REMOVE THE UGLY RIGHT SCROLLBAR ========= */
+        .fc-scroller {
+          scrollbar-width: none !important;
+          -ms-overflow-style: none !important;
+        }
+        .fc-scroller::-webkit-scrollbar {
+          display: none !important;
+        }
 
         /* Toolbar title */
         .fc-toolbar-title {
           text-transform: uppercase;
-          text-align: centet !important;
+          text-align: center !important;
           color: #00e676;
           font-weight: 700;
           font-size: 1.6rem !important;
           letter-spacing: 2px;
-          margin-bottom: 0.3rem;
         }
 
         /* Navigation buttons */
         .fc .fc-button {
-          background-color: black;
-          border: 1px solid #00e676;
-          color: #00e676;
+          background-color: black !important;
+          border: 1px solid #00e676 !important;
+          color: #00e676 !important;
           font-weight: 600;
           text-transform: uppercase;
           padding: 6px 14px !important;
           font-size: 0.9rem !important;
           min-width: 90px !important;
         }
-        .fc .fc-toolbar-chunk{
+
+        .fc .fc-toolbar-chunk {
           display: flex;
           flex-wrap: wrap;
           justify-content: center;
           gap: 0.4rem;
         }
 
-        /* Larger prev/next arrows */
         .fc-prev-button,
         .fc-next-button {
           font-size: 1.1rem !important;
-          padding: 6px 14px !important;
         }
 
-        /* Calendar grid background */
+        /* Calendar grid wrapper */
         .fc-scrollgrid {
           border: 0.5px solid white !important;
           border-radius: 8px;
-          overflow: hiddenl
+          overflow: hidden !important;
         }
 
         /* Grid lines */
         .fc-theme-standard td,
         .fc-theme-standard th {
           border-top: none !important;
-          border-left: none !important
+          border-left: none !important;
         }
         .fc-theme-standard tr:last-child td {
           border-bottom: none !important;
         }
         .fc-theme-standard th:last-child,
         .fc-theme-standard td:last-child {
-         border-right: none !important;
+          border-right: none !important;
         }
-        /* Day and header text color */
+
+        /* Header text (Mon 24, Tue 25…) */
         .fc-col-header-cell-cushion,
         .fc-daygrid-day-number {
           color: #d0d0d0 !important;
         }
 
-        /* Highlight current day */
+        /* Today highlight */
         .fc-day-today {
           background-color: rgba(0, 230, 118, 0.15) !important;
         }
 
-        /* Event style */
+        /* Events */
         .fc-event {
           border: none !important;
           background-color: #00e676 !important;
           color: #000000 !important;
           font-weight: 700;
           border-radius: 6px;
-          transition: transform 0.15s ease, box-shadow 0.2s ease;
           padding: 2px 4px;
+          transition: transform 0.15s ease, box-shadow 0.2s ease;
         }
 
-        /* Hover effect for events */
         .fc-event:hover {
           transform: scale(1.05);
           box-shadow: 0 0 10px rgba(0, 230, 118, 0.4);
         }
 
-        /* Week and Day view time column */
-        .fc-timegrid-slot-label {
+        /* Time labels (e.g., 6:00, 7:00) */
+        .fc-timegrid-slot-label,
+        .fc-timegrid-axis-cushion {
           color: #aaa !important;
         }
 
-        /* Event time and title both black */
-        .fc-event-time,
-        .fc-event-title {
-          color: #000000 !important;
-          font-weight: 700;
-        }
-
-        /* Axis labels */
-        .fc-timegrid-axis-cushion,
-        .fc-timegrid-axis {
-          color: #ffffff !important; 
-          font-weight: 600;
-        }
-          /* Fix for smaller screens */
-          @media (max-width: 1024px) {
-            .fc-toolbar.fc-header-toolbar {
-              flex-wrap: wrap !important;
-              justify-content: center !important;
-              gap: 0.5rem;
-            }
-
-            .fc-toolbar-title {
-              text-align: center !important;
-              flex: 1 1 100%;
-              font-size: 1.3rem !important;
-            }
-
-            .fc .fc-button {
-              font-size: 0.8rem !important;
-              padding: 4px 10px !important;
-              min-width: 70px !important;
-            }
-              .fc .fc-toolbar-chunk {
-              display: flex;
-              justify-content: center;
-              flex-wrap: wrap;
-              gap: 0.3rem;
-            }
+        /* Mobile / tablet layout adjustments */
+        @media (max-width: 1024px) {
+          .fc-toolbar.fc-header-toolbar {
+            flex-wrap: wrap !important;
+            justify-content: center !important;
+            gap: 0.5rem;
           }
-          @media (max-width: 600px) {
-            .fc-toolbar.fc-header-toolbar {
-              flex-direction: column !important;
-              align-items: center !important;
-            }
+          .fc-toolbar-title {
+            font-size: 1.3rem !important;
+          }
+          .fc .fc-button {
+            font-size: 0.8rem !important;
+            min-width: 70px !important;
+          }
+        }
 
-            .fc-toolbar-title {
-              font-size: 1.1rem !important;
-              margin: 0.4rem 0 !important;
-            }
-
-            .fc .fc-button {
-              font-size: 0.75rem !important;
-              padding: 3px 8px !important;
-              min-width: 60px !important;
-            }
-
-            .fc .fc-button-group {
-              display: flex;
-              justify-content: center;
-              flex-wrap: wrap;
-            }
-            
+        @media (max-width: 600px) {
+          .fc-toolbar.fc-header-toolbar {
+            flex-direction: column !important;
+          }
+          .fc-toolbar-title {
+            font-size: 1.1rem !important;
+          }
+          .fc .fc-button {
+            font-size: 0.75rem !important;
+            min-width: 60px !important;
+          }
+        }
       `}
       </style>
 
-      {/* === FULLCALENDAR === */}
+      {/* === FULLCALENDAR COMPONENT === */}
       <FullCalendar
         locale="en-GB"
         height="calc(100vh - 120px)"
@@ -268,14 +232,8 @@ export default function TrainingsCalendar() {
           center: "title",
           right: "dayGridMonth,timeGridWeek,timeGridDay",
         }}
-        titleFormat={{
-          year: "numeric",
-          month: "long",
-        }}
-        dayHeaderFormat={{
-          weekday: "short",
-          day: "2-digit",
-        }}
+        titleFormat={{ year: "numeric", month: "long" }}
+        dayHeaderFormat={{ weekday: "short", day: "2-digit" }}
         events={events}
         nowIndicator
         eventDisplay="block"
