@@ -12,6 +12,7 @@ import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
+import { apiGet } from "../api/apiClient";
 
 dayjs.extend(customParseFormat);
 
@@ -32,14 +33,8 @@ export default function TrainingsCalendar() {
 
   // === FETCH TRAININGS ===
   useEffect(() => {
-    fetch(
-      "https://customer-rest-service-frontend-personaltrainer.2.rahtiapp.fi/api/trainings"
-    )
-      .then((response) => response.json())
-      .then((data) => {
-        if (data._embedded?.trainings) setTrainings(data._embedded.trainings);
-        else setTrainings(data);
-      })
+    apiGet<{ _embedded?: { trainings: Training[] } }>("/trainings")
+      .then((data) => setTrainings(data._embedded?.trainings ?? []))
       .catch((err) => console.error("Error fetching trainings:", err));
   }, []);
 

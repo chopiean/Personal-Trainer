@@ -30,8 +30,7 @@ import dayjs from "dayjs";
 import ConfirmDialog from "../components/ConfirmDialog";
 import TrainingDialog from "../components/TrainingDialog";
 import type { Customer } from "./CustomersPage";
-
-const API_BASE = import.meta.env.VITE_API_URL;
+import { apiDelete, apiGet, apiPost, apiPut } from "../api/apiClient";
 
 // === Type definitions ===
 type TrainingCustomer = Pick<Customer, "firstname" | "lastname">;
@@ -63,8 +62,7 @@ export default function TrainingsPage() {
   const fetchTrainings = async () => {
     setLoading(true);
     try {
-      const res = await fetch(`${API_BASE}/gettrainings`);
-      const data = await res.json();
+      const data = await apiGet<Training[]>("/gettrainings");
       setTrainings(data);
     } catch (err) {
       console.error("Fetch error:", err);
@@ -123,10 +121,9 @@ export default function TrainingsPage() {
   // === Save or Update Training ===
   const saveTraining = async (t: Training) => {
     const editing = Boolean(selectedTraining?.id);
-    const method = editing ? "PUT" : "POST";
-    const url = editing
-      ? `${API_BASE}/trainings/${selectedTraining!.id}`
-      : `${API_BASE}/trainings`;
+    const endpoint = editing
+      ? `/trainings/${selectedTraining!.id}`
+      : "/trainings";
 
     const customerForApi =
       typeof t.customer === "string"
@@ -141,16 +138,9 @@ export default function TrainingsPage() {
     };
 
     try {
-      const res = await fetch(url, {
-        method,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
+      if (editing) await apiPut(endpoint, payload);
+      else await apiPost(endpoint, payload);
 
-      if (!res.ok) throw new Error("Save or update failed.");
-
-      setOpenDialog(false);
-      setSelectedTraining(undefined);
       fetchTrainings();
       setSnackbar({
         open: true,
@@ -158,20 +148,21 @@ export default function TrainingsPage() {
           ? "Training updated successfully!"
           : "Training added successfully!",
       });
-    } catch (err) {
-      console.error("Save/update error:", err);
+    } catch {
       setSnackbar({ open: true, message: "Error saving training." });
     }
+
+    setOpenDialog(false);
+    setSelectedTraining(undefined);
   };
 
   // === Delete Training ===
   const handleDeleteTraining = async (id: number) => {
     try {
-      await fetch(`${API_BASE}/trainings/${id}`, { method: "DELETE" });
+      await apiDelete(`/trainings/${id}`);
       fetchTrainings();
       setSnackbar({ open: true, message: "Training deleted." });
-    } catch (error) {
-      console.error("Delete error:", error);
+    } catch {
       setSnackbar({ open: true, message: "Error deleting training." });
     } finally {
       setConfirm({ open: false, id: 0 });

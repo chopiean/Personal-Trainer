@@ -17,6 +17,7 @@ import {
 import _ from "lodash";
 import { Stack, Typography, CircularProgress } from "@mui/material";
 import { motion, easeInOut } from "framer-motion";
+import { apiGet } from "../api/apiClient";
 
 // === Type definition ===
 type Training = {
@@ -34,15 +35,11 @@ export default function StatisticsPage() {
 
   // === Fetch data ===
   useEffect(() => {
-    fetch(
-      "https://customer-rest-service-frontend-personaltrainer.2.rahtiapp.fi/api/trainings"
-    )
-      .then((response) => response.json())
+    apiGet<{ _embedded?: { trainings: Training[] } }>("/trainings")
       .then((data) => {
-        if (data._embedded?.trainings) setTrainings(data._embedded.trainings);
-        else setTrainings(data);
+        setTrainings(data._embedded?.trainings ?? []);
       })
-      .catch((err) => console.error("Error fetching trainings: ", err))
+      .catch((err) => console.error("Error fetching trainings:", err))
       .finally(() => setTimeout(() => setLoading(false), 400));
   }, []);
 
