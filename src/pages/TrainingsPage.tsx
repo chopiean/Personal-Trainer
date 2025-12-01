@@ -31,8 +31,7 @@ import ConfirmDialog from "../components/ConfirmDialog";
 import TrainingDialog from "../components/TrainingDialog";
 import type { Customer } from "./CustomersPage";
 
-const API_BASE =
-  "https://customer-rest-service-frontend-personaltrainer.2.rahtiapp.fi/api";
+const API_BASE = import.meta.env.VITE_API_URL;
 
 // === Type definitions ===
 type TrainingCustomer = Pick<Customer, "firstname" | "lastname">;

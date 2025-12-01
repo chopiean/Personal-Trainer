@@ -35,8 +35,8 @@ import CustomerDialog from "../components/CustomerDialog";
 import TrainingDialog from "../components/TrainingDialog";
 import ConfirmDialog from "../components/ConfirmDialog";
 
-const API_BASE =
-  "https://customer-rest-service-frontend-personaltrainer.2.rahtiapp.fi/api";
+import { apiGet, apiPost, apiPut, apiDelete } from "../api/apiClient";
+const API_BASE = import.meta.env.VITE_API_URL;
 
 // === Types ===
 export type Customer = {
@@ -75,13 +75,19 @@ export default function CustomersPage() {
   });
 
   // ===== FETCH DATA =====
-  const fetchCustomers = () => {
+  const fetchCustomers = async () => {
     setLoading(true);
-    fetch(`${API_BASE}/customers`)
-      .then((res) => res.json())
-      .then((data) => setCustomers(data._embedded?.customers ?? []))
-      .catch((err) => console.error("Fetch error:", err))
-      .finally(() => setLoading(false));
+    try {
+      const data = await apiGet<{
+        _embedded?: { customers: Customer[] };
+      }>("/customers");
+
+      setCustomers(data._embedded?.customers ?? []);
+    } catch (err) {
+      console.error("Fetch error", err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -118,39 +124,36 @@ export default function CustomersPage() {
   };
 
   // ===== SAVE / EDIT CUSTOMER =====
-  const saveCustomer = (cust: Customer) => {
-    const method = editCust ? "PUT" : "POST";
-    const url = editCust ? editCust._links?.self.href : `${API_BASE}/customers`;
-
-    if (!url) return;
-    fetch(url, {
-      method,
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(cust),
-    })
-      .then(() => fetchCustomers())
-      .finally(() => setOpenCustDialog(false));
+  const saveCustomer = async (cust: Customer) => {
+    try {
+      if (editCust) {
+        await apiPut(editCust._links!.self.href.replace(API_BASE, ""), cust);
+      } else {
+        await apiPost("/customers", cust);
+      }
+      fetchCustomers();
+    } finally {
+      setOpenCustDialog(false);
+    }
   };
 
   // ===== DELETE CUSTOMER =====
-  const deleteCustomer = (url: string) => {
-    fetch(url, { method: "DELETE" })
-      .then(() => fetchCustomers())
-      .finally(() => setConfirm({ open: false, url: "" }));
+  const deleteCustomer = async (url: string) => {
+    const cleanUrl = url.replace(API_BASE, "");
+    await apiDelete(cleanUrl);
+    fetchCustomers();
+    setConfirm({ open: false, url: "" });
   };
 
   // ===== SAVE TRAINING =====
-  const saveTraining = (t: Training) => {
-    fetch(`${API_BASE}/trainings`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(t),
-    })
-      .then(() => {
-        setTrainingDialog({ open: false, href: "" });
-        alert("Training added successfully!");
-      })
-      .catch((err) => console.error("Add training error:", err));
+  const saveTraining = async (t: Training) => {
+    try {
+      await apiPost("/trainings", t);
+      setTrainingDialog({ open: false, href: "" });
+      alert("Training added successfully");
+    } catch (err) {
+      console.error("Add training error", err);
+    }
   };
 
   // === Export customers to CSV ===
